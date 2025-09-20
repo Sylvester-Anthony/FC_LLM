@@ -1,4 +1,6 @@
 import re
+import tiktoken
+
 
 with open("/Users/sylvesteranthony/Documents/FC_LLM/data/datacommentary.txt","r", encoding="utf-8") as f:
     raw_text = f.read()
@@ -16,6 +18,8 @@ all_tokens = sorted(list(set(preprocessed)))
 all_tokens.extend(["<|endoftext|>","<|unk|>"])
 
 vocab = {token:integer for integer,token in enumerate(all_tokens)}
+
+len(vocab)
 
 
 class SimpleTokenizerV1:
@@ -79,6 +83,38 @@ text4 = "In the sunlit terraces of the palace."
 joined_text = " <|endoftext|> ".join((text3, text4))
 print(tokenizerv2.encode(joined_text))
 print(tokenizerv2.decode(tokenizerv2.encode(joined_text)))
-        
-        
 
+
+tokenizer = tiktoken.get_encoding("gpt2")
+text = (
+    "Hello, do you like tea? <|endoftext|> In the sunlit terraces"
+     "of someunknownPlace."
+)
+integers = tokenizer.encode(text, allowed_special={"<|endoftext|>"})
+print(integers)
+        
+strings = tokenizer.decode(integers)
+print(strings)
+
+
+enc_text = tokenizer.encode(raw_text)
+all_tokens = sorted(list(set(enc_text)))
+print(f"the vocab size is:",len(all_tokens))
+
+enc_sample = enc_text[50:]
+context_size = 4
+x = enc_sample[:context_size]
+y = enc_sample[1:context_size+1]
+print(f"x: {x})") 
+print(f"y:     {y}")
+
+
+for i in range(1, context_size+1):
+    context = enc_sample[:i]
+    desired = enc_sample[i]
+    print(context, "------>", desired)
+    
+for i in range(1, context_size+1):
+    context = enc_sample[:i]
+    desired = enc_sample[i]
+    print(tokenizer.decode(context), "------>", tokenizer.decode([desired]))
